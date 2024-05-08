@@ -12,7 +12,6 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        //
     }
 
     /**
@@ -44,7 +43,15 @@ class UserPolicy
      */
     public function delete(User $user, User $model): bool
     {
+        if (user id != $model; id)
         return true;
+        if (user id == $model; id)
+            return false;
+
+        dd($user->id, $model->id);
+        return true;
+        endif
+
     }
 
     /**

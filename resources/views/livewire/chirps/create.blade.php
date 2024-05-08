@@ -6,13 +6,15 @@ new class extends Component {
     #[Validate('required|string|max:255')]
     public string $message = '';
 
-    public function store(): void
+    public function store()
     {
         $validated = $this->validate();
 
         auth()->user()->chirps()->create($validated);
 
         $this->message = '';
+
+        return redirect('dashboard');
     }
 }; ?>
 

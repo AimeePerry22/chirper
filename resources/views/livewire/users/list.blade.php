@@ -6,12 +6,10 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
-    new class extends Component
-{
+new class extends Component {
     public Collection $users;
-}
 
-    public ?Chirp $editing = null;
+    public ?User $editing = null;
 
 
     public function mount(): void
@@ -19,30 +17,14 @@ use Livewire\Volt\Component;
         $this->getUsers();
     }
 
-    #[On('chirp-created')]
+    #[On('Users-created')]
     public function getUsers(): void
     {
         $this->users = User::latest()
             ->get();
     }
 
-    #[On('users-created')]
-    public function getUsers(): void
-    {
-        $this->users = User::latest()
-            ->get();
-    }
-
-    #[On('users-edit-canceled')]
-    #[On('users-updated')]
-    public function disableEditing(): void
-    {
-        $this->editing = null;
-
-        $this->getusers();
-
-
-    public function edit(user $user): void
+    public function edit(User $user): void
     {
         $this->editing = $user;
 
@@ -50,8 +32,8 @@ use Livewire\Volt\Component;
     }
 
 
-    #[On('chirp-edit-canceled')]
-    #[On('chirp-updated')]
+    #[On('users-edit-canceled')]
+    #[On('users-updated')]
     public function disableEditing(): void
     {
         $this->editing = null;
@@ -60,7 +42,7 @@ use Livewire\Volt\Component;
     }
 
 
-    public function delete(Users $users): void
+    public function delete(User $users): void
     {
         $this->authorize('delete', $users);
         $users->delete();
@@ -69,45 +51,58 @@ use Livewire\Volt\Component;
 
 }; ?>
 
-
 <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
-    @foreach ($users as $user)
-        <div class="p-6 flex space-x-2" wire:key="{{ $user->id }}">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 text-gray-600 -scale-x-100" fill="none"
-                 viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round"
-                      d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-            </svg>
-            <div class="flex-1">
-                <div class="flex justify-between items-center">
-                    <div>
-                        <span class="text-gray-800">{{ $user->name }}</span>
-                        <small
-                            class="ml-2 text-sm text-gray-600">{{ $user->created_at->format('j M Y, g:i a') }}</small>
-                        @unless ($user->created_at->eq($user->updated_at))
-                            <small class="text-sm text-gray-600"> &middot; {{ __('edited') }}</small>
-                        @endunless
-                    </div>
-                    <x-dropdown>
-                        <x-slot name="trigger">
-                            <button>
-                                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                                    <path d="M6 10a2 2 0 11-4 0 2 2 0 014 0zM12 10a2 2 0 11-4 0 2 2 0 014 0zM16 12a2 2 0 100-4 2 2 0 000 4z" />
-                                </svg>
-                            </button>
-                        </x-slot>
-                        <x-slot name="content">
-                            <x-dropdown-link wire:click="edit({{ $user->id }})">
-                                {{ __('Edit') }}
-                            </x-dropdown-link>
-                            <x-dropdown-link wire:click="delete({{ $user->id }})" wire:confirm="Are you sure to delete this user?">
-                                {{ __('Delete') }}
-                            </x-dropdown-link>
-                        </x-slot>
-                    </x-dropdown>
-                </div>
-{{--                <livewire:users.edit :user="$user" :key="$user->id"/>--}}
-            </div>
-        </div>
-    @endforeach
+
+
+
+    <div class="relative overflow-x-auto">
+        <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+            <tr>
+                <th scope="col" class="px-6 py-3">
+                    Name
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    email
+                </th>
+                <th scope="col" class="px-6 py-3">
+                 date created
+                </th>
+                <th scope="col" class="px-6 py-3">
+                    when last updated
+                </th>
+                <th>
+                    Delete
+                </th>
+            </tr>
+            </thead>
+            <tbody>
+            @foreach($users as $user)
+                <tr class="bg-white border-b dark:bg-purple-800 dark:border-purle-700">
+                    <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+                        <p x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')" class="text-blue-500 hover:text-blue-400 cursor-pointer hover:underline">{{ $user->name }}</p>
+                    </th>
+                    <td class="px-6 py-4">
+                        {{$user->email}}
+                    </td>
+                    <td class="px-6 py-4">
+                       {{$user->created_at}}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{$user->updated_at}}
+                    </td>
+                    <td>
+                        <p wire:click="delete({{ $user->id }})" wire:confirm="Are you sure to delete this user?">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="purple-200" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
+                                <path stroke-linecap="round" stroke-linejoin="regular" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                            </svg>
+
+                            {{ __('Delete') }}
+                        </p>
+                    </td>
+                </tr>
+            @endforeach
+            </tbody>
+        </table>
+    </div>
 </div>

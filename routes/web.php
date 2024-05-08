@@ -5,11 +5,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\ChirpController;
 Route::view('/', 'welcome');
 
-Route::get('chirps', [ChirpController::class, 'index'])
-    ->middleware(['auth', 'verified'])
-    ->name('chirps');
-
-Route::get('users', [UserController::class, 'index'])
+Route::middleware(['role:admin'])->get('users', [UserController::class, 'index'])
     ->middleware(['auth', 'verified'])
     ->name('users');
 

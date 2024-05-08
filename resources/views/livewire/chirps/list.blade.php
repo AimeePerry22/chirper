@@ -44,7 +44,8 @@ new class extends Component {
         $chirp->delete();
 
         $this->getChirps();
-    } }; ?>
+    }
+}; ?>
 
 <div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
     @foreach ($chirps as $chirp)
