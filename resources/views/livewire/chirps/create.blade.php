@@ -3,7 +3,6 @@ use Livewire\Attributes\Validate;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    //
     #[Validate('required|string|max:255')]
     public string $message = '';
 

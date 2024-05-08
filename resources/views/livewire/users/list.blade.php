@@ -6,10 +6,13 @@ use Illuminate\Database\Eloquent\Collection;
 use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
-new class extends Component {
+    new class extends Component
+{
     public Collection $users;
+}
 
     public ?Chirp $editing = null;
+
 
     public function mount(): void
     {
@@ -23,8 +26,23 @@ new class extends Component {
             ->get();
     }
 
+    #[On('users-created')]
+    public function getUsers(): void
+    {
+        $this->users = User::latest()
+            ->get();
+    }
 
-    public function edit(User $user): void
+    #[On('users-edit-canceled')]
+    #[On('users-updated')]
+    public function disableEditing(): void
+    {
+        $this->editing = null;
+
+        $this->getusers();
+
+
+    public function edit(user $user): void
     {
         $this->editing = $user;
 
@@ -41,7 +59,8 @@ new class extends Component {
         $this->getChirps();
     }
 
-    public function delete(User $users): void
+
+    public function delete(Users $users): void
     {
         $this->authorize('delete', $users);
         $users->delete();
