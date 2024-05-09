@@ -33,7 +33,12 @@ new class extends Component
                     <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" wire:navigate>
                         {{ __('Dashboard') }}
                     </x-nav-link>
-                </div>
+                    @hasrole('admin')
+                    <x-nav-link :href="route('users')" :active="request()->routeIs('users')" wire:navigate>
+                        {{ __('Users') }}
+                    </x-nav-link>
+                    @endhasrole
+                    </div>
             </div>
 
             <!-- Settings Dropdown -->
