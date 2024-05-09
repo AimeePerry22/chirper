@@ -14,7 +14,13 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {
-        User::factory(100)->create();
+        Role::create(['name' => 'member']);
+
+        $users = User::factory(100)->create();
+
+        foreach ($users as $user) {
+            $user->assignRole('member');
+        }
 
         Role::create(['name' => 'admin']);
 
@@ -25,15 +31,42 @@ class DatabaseSeeder extends Seeder
 
         $user->assignRole('admin');
 
-        User::factory()->create([
-            'name' => 'Test Non Admin',
-            'email' => 'test2@example.com',
+        Role::create(['name' => 'premium']);
+
+        $user = User::factory()->create([
+            'name' => 'Test premium',
+            'email' => 'premium@example.com',
         ]);
 
-        User::factory()->create([
-            'name' => 'Non Verified User',
-            'email' => 'test3@example.com',
-            'email_verified_at' => null
+        $user->assignRole('premium');
+
+        Role::create(['name' => 'guest']);
+
+        $user = User::factory()->create([
+            'name' => 'Testguest ',
+            'email' => 'testguest@example.com',
         ]);
+        $user->assignRole('guest');
+
+        Role::create(['name' => 'VIP']);
+
+        $user = User::factory()->create([
+            'name' => 'TestVIP ',
+            'email' => 'testVIP@example.com',
+        ]);
+        $user->assignRole('VIP');
+
+        Role::create(['name' => 'verified']);
+
+        $user = User::factory()->create([
+            'name' => 'verifieduser ',
+            'email' => 'testverify@example.com',
+        ]);
+        $user->assignRole('verified');
     }
+
+
 }
+
+
+

@@ -7,22 +7,16 @@ use Livewire\Attributes\On;
 use Livewire\Volt\Component;
 
 new class extends Component {
-    public Collection $users;
-
     public ?User $editing = null;
 
+    public string $query = '';
 
-    public function mount(): void
-    {
-        $this->getUsers();
-    }
-
-    #[On('Users-created')]
-    public function getUsers(): void
-    {
-        $this->users = User::latest()
-            ->get();
-    }
+//    #[On('Users-created')]
+//    public function getUsers(): void
+//    {
+//        $this->users = User::latest()
+//            ->get();
+//    }
 
     public function edit(User $user): void
     {
@@ -31,6 +25,10 @@ new class extends Component {
         $this->getUsers();
     }
 
+    public function search()
+    {
+        $this->resetPage();
+    }
 
     #[On('users-edit-canceled')]
     #[On('users-updated')]
@@ -46,12 +44,59 @@ new class extends Component {
     {
         $this->authorize('delete', $users);
         $users->delete();
-        $this->getUsers();
     }
 
-}; ?>
+    use \Livewire\WithPagination;
 
-<div class="mt-6 bg-white shadow-sm rounded-lg divide-y">
+    public function with(): array
+    {
+        return [
+            'users' => User::where('name', 'LIKE', '%' . $this->query . '%')
+                ->orWhere('name', 'LIKE', '%' . $this->query . '%')
+                ->simplePaginate(10),
+        ];
+    }
+    }; ?>
+
+<div class="mt-6 divide-y">
+
+    <div class="p-6 bg-white">
+        <form wire:submit="search" class="p-4">
+            <p class="text-lg mb-6">Filter Users</p>
+            <div class="flex justify-between">
+                <div>
+                    <div class="mb-4">
+                        <x-input-label for="password_confirmation" :value="__('Search')" />
+                        <x-text-input
+                            wire:model="query"
+                            placeholder="{{ __('search') }}"
+                            class="block w-full border-yellow-600 focus:border-yellow-300 focus:ring focus:ring-yellow-900 focus:ring-opacity-100 rounded-md shadow-sm"
+                        ></x-text-input>
+                        @if (count($users) === 1)
+                            There is one user!
+                        @elseif (count($users) > 1)
+                            There are multiple users!
+                        @else
+                            There aren't any users!
+                        @endif
+                    </div>
+                </div>
+            </div>
+            <x-primary-button type="submit">Search posts</x-primary-button>
+        </form>
+    </div>
+
+
+
+    @if($users->count())
+    <div class="p-6 bg-white my-6">
+        {{ $users->links() }}
+    </div>
+
+    @else
+
+        sdkfopsfk
+    @endif
 
 
 
@@ -71,6 +116,9 @@ new class extends Component {
                 <th scope="col" class="px-6 py-3">
                     when last updated
                 </th>
+                <th scope="col" class="px-6 py-3">
+                    role
+                </th>
                 <th>
                     Delete
                 </th>
@@ -78,7 +126,7 @@ new class extends Component {
             </thead>
             <tbody>
             @foreach($users as $user)
-                <tr class="bg-white border-b dark:bg-purple-800 dark:border-purle-700">
+                <tr class="bg-orange-200 border-b dark:bg-purple-800 dark:border-purle-700">
                     <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
                         <p x-on:click.prevent="$dispatch('open-modal', 'confirm-user-deletion')" class="text-blue-500 hover:text-blue-400 cursor-pointer hover:underline">{{ $user->name }}</p>
                     </th>
@@ -91,6 +139,9 @@ new class extends Component {
                     <td class="px-6 py-4">
                         {{$user->updated_at}}
                     </td>
+                    <td class="px-6 py-4">
+                        {{$user->getRoleNames() ? $user->getRoleNames()[0] : '--' }}
+                    </td>
                     <td>
                         <p wire:click="delete({{ $user->id }})" wire:confirm="Are you sure to delete this user?">
                             <svg xmlns="http://www.w3.org/2000/svg" fill="purple-200" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-7 h-7">
@@ -99,8 +150,8 @@ new class extends Component {
                         </p>
                     </td>
                 </tr>
-            @endforeach
             </tbody>
+            @endforeach
         </table>
     </div>
 </div>
