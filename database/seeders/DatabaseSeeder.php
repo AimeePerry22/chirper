@@ -29,5 +29,11 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test Non Admin',
             'email' => 'test2@example.com',
         ]);
+
+        User::factory()->create([
+            'name' => 'Non Verified User',
+            'email' => 'test3@example.com',
+            'email_verified_at' => null
+        ]);
     }
 }
